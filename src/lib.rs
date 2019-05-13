@@ -57,7 +57,7 @@ impl Section {
         }
     }
 
-    pub fn get_value(&self, key: &str) -> Option<&str> {
+    pub fn get(&self, key: &str) -> Option<&str> {
         self.entries.iter().find(|e| e.key == key).map(|e| e.value.as_str())
     }
 
@@ -140,8 +140,8 @@ impl Conf {
         output
     }
 
-    pub fn add_section(&mut self, name: String, entries: Vec<Entry>) {
-        self.sections.push(Section { name, entries });
+    pub fn add_section(&mut self, name: &str, entries: Vec<Entry>) {
+        self.sections.push(Section { name: name.to_string(), entries });
     }
 }
 
@@ -152,14 +152,14 @@ mod tests {
     #[test]
     fn test_section() {
         let mut expected = Conf::new();
-        expected.add_section("mySection".to_string(), Vec::new());
+        expected.add_section("mySection", Vec::new());
         assert_eq!(Conf::parse_str("[mySection]"), Ok(expected));
     }
 
     #[test]
     fn test_entry() {
         let mut expected = Conf::new();
-        expected.add_section("mySection".to_string(), vec![
+        expected.add_section("mySection", vec![
             Entry {
                 key: "a".to_string(),
                 value: "b".to_string(),
@@ -171,13 +171,13 @@ mod tests {
     #[test]
     fn test_to_string() {
         let mut conf = Conf::new();
-        conf.add_section("sec1".to_string(), vec![
+        conf.add_section("sec1", vec![
             Entry {
                 key: "a".to_string(),
                 value: "b".to_string(),
             }
         ]);
-        conf.add_section("sec2".to_string(), vec![
+        conf.add_section("sec2", vec![
             Entry {
                 key: "c".to_string(),
                 value: "d".to_string(),
@@ -187,14 +187,14 @@ mod tests {
     }
 
     #[test]
-    fn test_section_get_value() {
+    fn test_section_get() {
         let conf = Conf::from_sections(vec![
             Section::new_with_entries("mySection", vec![
                 Entry::new("a", "b"),
                 Entry::new("x", "y"),
             ])
         ]);
-        assert_eq!(conf.sections[0].get_value("x"), Some("y"));
+        assert_eq!(conf.sections[0].get("x"), Some("y"));
     }
 
     #[test]
