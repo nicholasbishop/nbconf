@@ -24,6 +24,13 @@ pub struct Entry {
 }
 
 impl Entry {
+    pub fn new(&self, key: &str, value: &str) -> Entry {
+        Entry {
+            key: key.to_string(),
+            value: value.to_string(),
+        }
+    }
+
     pub fn to_string(&self) -> String {
         format!("{} = {}", self.key, self.value)
     }
