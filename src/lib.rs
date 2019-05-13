@@ -143,6 +143,10 @@ impl Conf {
     pub fn add_section(&mut self, name: &str, entries: Vec<Entry>) {
         self.sections.push(Section { name: name.to_string(), entries });
     }
+
+    pub fn section_names(&self) -> Vec<&str> {
+        self.sections.iter().map(|section| section.name.as_str()).collect()
+    }
 }
 
 #[cfg(test)]
@@ -195,6 +199,15 @@ mod tests {
             ])
         ]);
         assert_eq!(conf.sections[0].get("x"), Some("y"));
+    }
+
+    #[test]
+    fn test_conf_section_names() {
+        let conf = Conf::from_sections(vec![
+            Section::new("sec1"),
+            Section::new("sec2"),
+        ]);
+        assert_eq!(conf.section_names(), vec!["sec1", "sec2"]);
     }
 
     #[test]
