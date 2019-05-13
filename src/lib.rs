@@ -24,7 +24,7 @@ pub struct Entry {
 }
 
 impl Entry {
-    pub fn new(&self, key: &str, value: &str) -> Entry {
+    pub fn new(key: &str, value: &str) -> Entry {
         Entry {
             key: key.to_string(),
             value: value.to_string(),
@@ -43,6 +43,24 @@ pub struct Section {
 }
 
 impl Section {
+    pub fn new(name: &str) -> Section {
+        Section {
+            name: name.to_string(),
+            entries: Vec::new(),
+        }
+    }
+
+    pub fn new_with_entries(name: &str, entries: Vec<Entry>) -> Section {
+        Section {
+            name: name.to_string(),
+            entries,
+        }
+    }
+
+    pub fn get_value(&self, key: &str) -> Option<&str> {
+        self.entries.iter().find(|e| e.key == key).map(|e| e.value.as_str())
+    }
+
     pub fn to_string(&self) -> String {
         let mut result = format!("[{}]", self.name);
         for entry in self.entries.iter() {
@@ -51,15 +69,6 @@ impl Section {
         }
         result += "\n";
         result
-    }
-}
-
-impl Section {
-    pub fn new(name: String) -> Section {
-        Section {
-            name,
-            entries: Vec::new(),
-        }
     }
 }
 
@@ -75,6 +84,10 @@ impl Conf {
         }
     }
 
+    pub fn from_sections(sections: Vec<Section>) -> Conf {
+        Conf { sections }
+    }
+
     pub fn parse_str(s: &str) -> Result<Conf, ParseError> {
         let mut conf = Conf::new();
         let mut line_no = 0;
@@ -84,7 +97,7 @@ impl Conf {
             if line.starts_with('[') {
                 if line.ends_with(']') {
                     let name = &line[1..line.len() - 1];
-                    conf.sections.push(Section::new(name.to_string()));
+                    conf.sections.push(Section::new(name));
                 } else {
                     return Err(ParseError::new(
                         line_no,
@@ -171,6 +184,17 @@ mod tests {
             }
         ]);
         assert_eq!(conf.to_string(), "[sec1]\na = b\n\n[sec2]\nc = d\n");
+    }
+
+    #[test]
+    fn test_section_get_value() {
+        let conf = Conf::from_sections(vec![
+            Section::new_with_entries("mySection", vec![
+                Entry::new("a", "b"),
+                Entry::new("x", "y"),
+            ])
+        ]);
+        assert_eq!(conf.sections[0].get_value("x"), Some("y"));
     }
 
     #[test]
