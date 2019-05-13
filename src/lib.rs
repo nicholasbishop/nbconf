@@ -119,6 +119,10 @@ impl Conf {
         }
         output
     }
+
+    pub fn add_section(&mut self, name: String, entries: Vec<Entry>) {
+        self.sections.push(Section { name, entries });
+    }
 }
 
 #[cfg(test)]
@@ -128,39 +132,37 @@ mod tests {
     #[test]
     fn test_section() {
         let mut expected = Conf::new();
-        expected
-            .sections
-            .push(Section::new("mySection".to_string()));
+        expected.add_section("mySection".to_string(), Vec::new());
         assert_eq!(Conf::parse_str("[mySection]"), Ok(expected));
     }
 
     #[test]
     fn test_entry() {
         let mut expected = Conf::new();
-        let mut section = Section::new("mySection".to_string());
-        section.entries.push(Entry {
-            key: "a".to_string(),
-            value: "b".to_string(),
-        });
-        expected.sections.push(section);
+        expected.add_section("mySection".to_string(), vec![
+            Entry {
+                key: "a".to_string(),
+                value: "b".to_string(),
+            }
+        ]);
         assert_eq!(Conf::parse_str("[mySection]\na = b"), Ok(expected));
     }
 
     #[test]
     fn test_to_string() {
         let mut conf = Conf::new();
-        let mut section = Section::new("sec1".to_string());
-        section.entries.push(Entry {
-            key: "a".to_string(),
-            value: "b".to_string(),
-        });
-        conf.sections.push(section);
-        let mut section = Section::new("sec2".to_string());
-        section.entries.push(Entry {
-            key: "c".to_string(),
-            value: "d".to_string(),
-        });
-        conf.sections.push(section);
+        conf.add_section("sec1".to_string(), vec![
+            Entry {
+                key: "a".to_string(),
+                value: "b".to_string(),
+            }
+        ]);
+        conf.add_section("sec2".to_string(), vec![
+            Entry {
+                key: "c".to_string(),
+                value: "d".to_string(),
+            }
+        ]);
         assert_eq!(conf.to_string(), "[sec1]\na = b\n\n[sec2]\nc = d\n");
     }
 
