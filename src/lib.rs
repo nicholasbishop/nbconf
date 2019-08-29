@@ -1,25 +1,59 @@
+//! Example:
+//!
+//! ```
+//! let conf = nbconf::Conf::parse_str("
+//!     [Section 1]
+//!     hello = world
+//!
+//!     [Section 2]
+//!     nice to = meet you").expect("failed to parse config");
+//!
+//! assert_eq!(conf.sections[0].name, "Section 1");
+//! assert_eq!(conf.sections[0].entries[0].key, "hello");
+//! assert_eq!(conf.sections[0].entries[0].value, "world");
+//!
+//! assert_eq!(conf.sections[1].name, "Section 2");
+//! assert_eq!(conf.sections[1].entries[0].key, "nice to");
+//! assert_eq!(conf.sections[1].entries[0].value, "meet you");
+//! ```
+
+/// The specific type of parse error.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ParseErrorKind {
+    /// An entry was found prior to any section being declared.
     EntryOutsideOfSection,
+    /// A section was declared, but the closing bracket is missing.
     MissingClosingBracket,
+    /// An entry is missing an equals (`=`).
     MissingEquals,
 }
 
+/// Error produced from [`Conf::parse_str`].
+///
+/// [`Conf::parse_str`]: struct.Conf.html#method.parse_str
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ParseError {
-    line: usize,
-    kind: ParseErrorKind,
+    /// Line where the error occurred (starting from 1).
+    pub line: usize,
+    /// Type of error.
+    pub kind: ParseErrorKind,
 }
 
 impl ParseError {
-    fn new(line: usize, kind: ParseErrorKind) -> ParseError {
+    /// Create a new [`ParseError`].
+    ///
+    /// [`ParseError`]: struct.ParseError.html
+    pub fn new(line: usize, kind: ParseErrorKind) -> ParseError {
         ParseError { line, kind }
     }
 }
 
+/// A single entry within the section.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Entry {
+    /// Name of the entry.
     pub key: String,
+    /// Value of the entry.
     pub value: String,
 }
 
@@ -36,9 +70,12 @@ impl Entry {
     }
 }
 
+/// A named section within the config.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Section {
+    /// Name of the section.
     pub name: String,
+    /// Entries within the section.
     pub entries: Vec<Entry>,
 }
 
@@ -72,22 +109,26 @@ impl Section {
     }
 }
 
+/// A collection of config sections.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Conf {
     pub sections: Vec<Section>,
 }
 
 impl Conf {
+    /// Create an empty config.
     pub fn new() -> Conf {
         Conf {
             sections: Vec::new(),
         }
     }
 
+    /// Create a pre-populated config.
     pub fn from_sections(sections: Vec<Section>) -> Conf {
         Conf { sections }
     }
 
+    /// Parse a string into a config.
     pub fn parse_str(s: &str) -> Result<Conf, ParseError> {
         let mut conf = Conf::new();
         let mut line_no = 0;
@@ -126,6 +167,7 @@ impl Conf {
         Ok(conf)
     }
 
+    /// Serialize the config as a string.
     pub fn to_string(&self) -> String {
         let mut output = String::new();
         let mut is_first = true;
@@ -140,10 +182,12 @@ impl Conf {
         output
     }
 
+    /// Append a section to the config.
     pub fn add_section(&mut self, name: &str, entries: Vec<Entry>) {
         self.sections.push(Section { name: name.to_string(), entries });
     }
 
+    /// Get all the sections' names.
     pub fn section_names(&self) -> Vec<&str> {
         self.sections.iter().map(|section| section.name.as_str()).collect()
     }
