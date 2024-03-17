@@ -1,9 +1,10 @@
+[badges.maintenance]
+status = "deprecated"
+
 [package]
 name = "nbconf"
-version = "1.0.0"
-authors = ["Nicholas Bishop <nicholasbishop@gmail.com>"]
+version = "1.0.1"
 edition = "2018"
 repository = "https://github.com/nicholasbishop/nbconf"
 license = "Apache-2.0"
 description = "Simple configuration file reader/writer"
-readme = "README.md"

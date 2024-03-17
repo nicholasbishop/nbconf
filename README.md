@@ -1,5 +1,7 @@
 # nbconf
 
+**This tool is no longer under active development. If you are interested in taking over or repurposing the name on crates.io, feel free to contact me: nbishop@nbishop.net**
+
 [![crates.io](https://img.shields.io/crates/v/nbconf.svg)](https://crates.io/crates/nbconf)
 [![Documentation](https://docs.rs/nbconf/badge.svg)](https://docs.rs/nbconf)
 
